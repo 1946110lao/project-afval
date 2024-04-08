@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/project-afval/static/css/main.f855e6bc.css",
-    "main.js": "/project-afval/static/js/main.55865595.js",
+    "main.js": "/project-afval/static/js/main.4ffe651e.js",
     "static/js/453.808d0055.chunk.js": "/project-afval/static/js/453.808d0055.chunk.js",
     "static/media/Dataset_Afval Duurzaam Zuyd.csv": "/project-afval/static/media/Dataset_Afval Duurzaam Zuyd.b7bca711375f6a016886.csv",
     "static/media/logo.svg": "/project-afval/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/project-afval/index.html",
     "main.f855e6bc.css.map": "/project-afval/static/css/main.f855e6bc.css.map",
-    "main.55865595.js.map": "/project-afval/static/js/main.55865595.js.map",
+    "main.4ffe651e.js.map": "/project-afval/static/js/main.4ffe651e.js.map",
     "453.808d0055.chunk.js.map": "/project-afval/static/js/453.808d0055.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.55865595.js"
+    "static/js/main.4ffe651e.js"
   ]
 }
