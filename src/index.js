@@ -4,11 +4,15 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Dashboard from './Dashboard';
+import Preview from './components/Preview';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Trashbin from './components/Trashbin';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Dashboard />
+   
+    <Preview />
   </React.StrictMode>
 );
 

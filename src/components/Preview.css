@@ -1,0 +1,12 @@
+.rect {
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+    transition: transform 0.3s ease}
+  
+    .rect:hover {
+      fill: #ccc;
+    }
+  .text {
+    text-anchor: middle;
+  }
