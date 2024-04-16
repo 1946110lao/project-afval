@@ -113,21 +113,21 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
             maxTotalKG = 10000;
           }
 
-          const yScale = d3.scaleLinear().domain([0, maxTotalKG]);
+          const yScaleAxis = d3.scaleLinear().domain([0, maxTotalKG]);
           if (binSize === 0.8) {
-            yScale.range([240, 80]);
+            yScaleAxis.range([240, 80]);
           } else if (binSize === 1) {
-            yScale.range([300, 100]);
+            yScaleAxis.range([300, 100]);
           } else if (binSize === 1.25) {
-            yScale.range([375, 125]);
+            yScaleAxis.range([375, 125]);
           }
-          const yAxis = d3.axisLeft(yScale);
+          const AxisY = d3.axisLeft(yScaleAxis);
 
           let yAxisGroup = svg
             .append("g")
             .attr("class", "y-axis")
 
-            .call(yAxis);
+            .call(AxisY);
 
           if (manualAdjustX < 0) {
             yAxisGroup.attr("transform", `translate(0, ${manualAdjustY})`);
@@ -148,47 +148,46 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
             .append("g")
             .attr("class", "binGroup")
             .attr("transform", `translate(${manualAdjustX}, ${manualAdjustY})`);
+          // Modify the stack creation to use a single key 'KG'
 
-          // Define color scale for afvalsoort categories
           const colorScale = d3
-            .scaleOrdinal()
-            .domain(trashTypeTotals.map(([Afvalsoort]) => Afvalsoort))
-            .range(d3.schemeCategory10);
+          .scaleOrdinal()
+          .domain(trashTypeTotals.map(([Afvalsoort]) => Afvalsoort))
+          .range(d3.schemeCategory10);
 
-          // Bar Creation group
-          const barGroup = binGroup.append("g").attr("class", "barGroup");
+        // Bar Creation group
+        const barGroup = binGroup.append("g").attr("class", "barGroup");
 
-          let stack = 0;
+        let stack = 0;
 
-          barGroup
-            .selectAll("g")
-            .data(trashTypeTotals)
-            .enter()
-            .append("g")
-            .attr("class", "trashTypeGroup")
-            .attr(
-              "transform",
-              (d, i) => `translate(${145 * binSize}, ${svgHeight - yScale(0)})` // Show the right values on the y-axis
-            )
-            .selectAll("rect")
-            .data(([afvalsoort, kg]) => [{ afvalsoort, kg }])
-            .enter()
-            .append("rect")
-
-            .attr("y", (d) => {
-              let barHeight = yScale(0) - yScale(d.kg);
-              let y = stack; // Start from the end of the previous bar
-              stack += barHeight; // Add the height of the current bar to the stack
-              return y;
-            })
-            .attr("width", (435 - 145) * binSize)
-            .attr("height", (d) => {
-              // Adjust height based on the range of yScale
-              const binHeight = yScale(0);
-              const barHeight = binHeight - yScale(d.kg);
-              return barHeight >= 0 ? barHeight : 0; // Ensure non-negative height
-            })
-            .attr("fill", (d) => colorScale(d.afvalsoort));
+        barGroup
+          .selectAll("g")
+          .data(trashTypeTotals)
+          .enter()
+          .append("g")
+          .attr("class", "trashTypeGroup")
+          .attr(
+            "transform",
+            (d, i) => `translate(${145 * binSize}, 0)` // Adjust the y position to 0
+          )
+          .selectAll("rect")
+          .data(([afvalsoort, kg]) => [{ afvalsoort, kg }])
+          .enter()
+          .append("rect")
+          .attr("y", (d) => {
+            let barHeight = yScaleAxis(0) - yScaleAxis(d.kg);
+            let y = yScaleAxis(0) - barHeight - stack; // Calculate y position based on kg value
+            stack += barHeight; // Add the height of the current bar to the stack
+            return y;
+          })
+          .attr("width", (435 - 145) * binSize)
+          .attr("height", (d) => {
+            // Adjust height based on the range of yScale
+            const binHeight = yScaleAxis(0);
+            const barHeight = binHeight - yScaleAxis(d.kg);
+            return barHeight >= 0 ? barHeight : 0; // Ensure non-negative height
+          })
+          .attr("fill", (d) => colorScale(d.afvalsoort));
 
           binGroup
             .append("rect")
@@ -217,8 +216,8 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
             .attr("stroke", "black")
             .attr("stroke-width", 3 * binSize);
 
-          let newGroup = binGroup.append("g");
-          newGroup
+          let wheelGroup = binGroup.append("g");
+          wheelGroup
             .append("circle")
             .attr("cx", 185 * binSize)
             .attr("cy", 340 * binSize)
@@ -227,7 +226,7 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
             .attr("stroke", "black")
             .attr("stroke-width", 3 * binSize);
 
-          newGroup
+          wheelGroup
             .append("circle")
             .attr("cx", 350 * binSize)
             .attr("cy", 340 * binSize)
@@ -236,7 +235,7 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
             .attr("stroke", "black")
             .attr("stroke-width", 3 * binSize);
 
-          newGroup
+          wheelGroup
             .append("polygon")
             .attr(
               "points",
@@ -251,7 +250,7 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
               "transform",
               `rotate(360, ${220 * binSize}, ${310 * binSize})`
             );
-          newGroup
+          wheelGroup
             .append("polygon")
             .attr(
               "points",
@@ -267,7 +266,7 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
               `rotate(360, ${300 * binSize}, ${310 * binSize})`
             );
 
-          newGroup
+          wheelGroup
             .append("rect")
             .attr("x", 190 * binSize)
             .attr("y", 301 * binSize)
@@ -277,7 +276,7 @@ const Trashbin = ({ selectedLocation, selectedYear }) => {
             .attr("stroke", "black")
             .attr("stroke-width", 5 * binSize);
 
-          newGroup
+          wheelGroup
             .append("rect")
             .attr("x", 355 * binSize)
             .attr("y", 301 * binSize)

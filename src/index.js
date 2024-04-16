@@ -8,11 +8,12 @@ import Preview from './components/Preview';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Trashbin from './components/Trashbin';
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
    
-    <Preview />
+    <Preview/>
   </React.StrictMode>
 );
 

@@ -4,6 +4,7 @@ import csvFile from "../data/Dataset_Afval Duurzaam Zuyd.csv";
 import Trashbin from "./Trashbin";
 import "./Preview.css";
 
+
 const Preview = () => {
   const [trashData, setTrashData] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
