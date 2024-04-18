@@ -1,8 +1,8 @@
-import Trashbin from "./components/Trashbin";
 
+import Preview from "./components/Preview";
 const Dashboard = () => {    
     return (
-       <Trashbin />
+       <Preview />
     );
 }
 

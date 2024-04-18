@@ -7,6 +7,8 @@ import Dashboard from './Dashboard';
 import Preview from './components/Preview';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Trashbin from './components/Trashbin';
+import RecyclePercentage from './components/RecyclePercentage';
+import WheelGroup from './components/BinCreation/WheelGroup';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

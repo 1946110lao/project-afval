@@ -10,3 +10,12 @@
   .text {
     text-anchor: middle;
   }
+
+  .rect-group:hover .rect {
+    transform: scale(1.07);
+  }
+  
+  .rect-group:hover .recycling-bar {
+    transform: scale(1.07);
+  }
+  

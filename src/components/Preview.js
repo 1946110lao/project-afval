@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import csvFile from "../data/Dataset_Afval Duurzaam Zuyd.csv";
 import Trashbin from "./Trashbin";
 import "./Preview.css";
@@ -12,7 +12,6 @@ const Preview = () => {
   const [maxLocations, setMaxLocations] = useState(0);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [TrashbinComponent, setTrashbinComponent] = useState(false);
-  
 
   useEffect(() => {
     d3.select(".preview").remove();
@@ -25,6 +24,7 @@ const Preview = () => {
         Year: d.Periode ? d.Periode.substring(0, 4).trim() : "", // Extract the year from Periode and trim
         Naam: d.Naam ? d.Naam.trim() : "", // Trim and normalize Naam
         KG: +d.KG.replace(",", "."), // Always replace commas with dots before converting
+        Afvalsoort: d.Afvalsoort ? d.Afvalsoort.trim() : "", // Trim and normalize Afvalsoort
       }));
 
       // Group data by Year and Naam
@@ -39,6 +39,7 @@ const Preview = () => {
         locations: Array.from(locations, ([name, values]) => ({
           location: name,
           totalTrash: Math.round(values.reduce((sum, d) => sum + d.KG, 0)),
+          recycledPercentage: calculateRecycledPercentage(values),
         })),
       }));
 
@@ -60,6 +61,19 @@ const Preview = () => {
     setSelectedYear(event.target.value);
   };
 
+  const calculateRecycledPercentage = (data) => {
+    const totalKG = d3.sum(data, (d) => d.KG);
+    const bedrijfsAfvalKG = d3.sum(
+      data.filter((d) => d.Afvalsoort === "Bedrijfsafval"),
+      (d) => d.KG
+    );
+    const bedrijfsAfvalGrofKG = d3.sum(
+      data.filter((d) => d.Afvalsoort === "Bedrijfsafval, grof"),
+      (d) => d.KG
+    );
+    const recycledKG = totalKG - bedrijfsAfvalKG - bedrijfsAfvalGrofKG;
+    return (recycledKG / totalKG) * 100;
+  };
 
   const firstThreeRectProps = [
     {
@@ -135,7 +149,7 @@ const Preview = () => {
         <Trashbin
           selectedLocation={selectedLocation}
           selectedYear={selectedYear}
-       
+          setSelectedLocation={setSelectedLocation}
         />
       ) : (
         <>
@@ -156,14 +170,26 @@ const Preview = () => {
                 .map((item, index) => (
                   <g key={index}>
                     {item.locations
-                      .sort((a, b) => a.totalTrash - b.totalTrash)
+                      .sort(
+                        (a, b) => b.recycledPercentage - a.recycledPercentage
+                      ) // Sort by recycled percentage descending
                       .map((location, i) => {
                         const rectProps =
                           i < 3
                             ? firstThreeRectProps[i]
                             : otherRectPropsArray[i - 3];
+                        const barHeight =
+                          (rectProps.height * location.recycledPercentage) /
+                          100;
+                        const barWidth = rectProps.width / 5;
+                        const barX =
+                          rectProps.x + (rectProps.width - barWidth) / 2;
+                        const barY = rectProps.y + rectProps.height - barHeight;
                         return (
-                          <g key={i}>
+                          <g key={i} className="rect-group">
+                            {/* Main rectangle */}
+
+                    
                             <rect
                               className="rect"
                               x={
@@ -207,21 +233,37 @@ const Preview = () => {
                                 setTrashbinComponent(true);
                                 setSelectedLocation(location.location);
                                 setSelectedYear(item.year);
-                                console.log(
-                                  "TrashbinComponent:",
-                                  TrashbinComponent
-                                ); // Add this line
-                                console.log(
-                                  "selectedLocation:",
-                                  location.location
-                                ); // Add this line
-
-                                console.log(
-                                  "selectedYear",
-                                  selectedYear
-                                );
                               }}
                             />
+
+                            {/* Recycling percentage bar */}
+                            <rect
+                              className="recycling-bar"
+                              x={barX}
+                              y={barY}
+                              width={barWidth}
+                              height={barHeight}
+                              style={{
+                                fill: "green",
+                                transition: `transform 0.3s ease`, // Use the same transition properties as the rectangles
+                                transformOrigin: `${barX + barWidth / 2}px ${
+                                  barY + barHeight
+                                }px`,
+                              }}
+                              onMouseOver={(e) => {
+                                e.target.style.transform = "scale(1.07)";
+                              }}
+                              onMouseOut={(e) => {
+                                e.target.style.transform = "scale(1)";
+                              }}
+                              onClick={() => {
+                                setTrashbinComponent(true);
+                                setSelectedLocation(location.location);
+                                setSelectedYear(item.year);
+                              }}
+                            />
+
+                            {/* Text label */}
                             <text
                               className="text"
                               x={rectProps.x + rectProps.width / 2} // Position the text in the horizontal center of the rectangle
@@ -247,7 +289,8 @@ const Preview = () => {
                                 x={rectProps.x + rectProps.width / 2}
                                 dy="1.2em"
                               >
-                                Total trash: {location.totalTrash} KG
+                                Recycling Percentage:{" "}
+                                {location.recycledPercentage.toFixed(2)}%
                               </tspan>
                             </text>
                           </g>
